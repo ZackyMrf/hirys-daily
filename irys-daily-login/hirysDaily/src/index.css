@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ========== FOUNDATION ========== */
+/* Font definitions */
+@font-face {
+  font-family: 'HirysFont';
+  src: url('/assets/font.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Root variables */
+:root {
+  --irys-accent: #7E46F2;
+  --irys-accent-hover: #6935c9;
+  --irys-accent-transparent: rgba(126, 70, 242, 0.1);
+  --irys-accent-border: rgba(126, 70, 242, 0.2);
+  --background-dark: #0f0f0f;
+  --background-card: rgba(18, 18, 18, 0.8);
+  --text-primary: #f4f4f4;
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  --border-color: #333;
+  --error-color: #ff4b4b;
+  --success-color: #00c853;
+  --warning-color: #ffbb00;
+}
+
+/* ========== GLOBAL STYLES ========== */
+html {
+  @apply bg-irysBlack text-irysText;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply min-h-screen;
+  font-family: 'HirysFont', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+#root {
+  @apply flex flex-col min-h-screen;
+}
+
+button {
+  @apply cursor-pointer;
+}
+
+button:disabled {
+  @apply cursor-not-allowed opacity-60;
+}
+
+textarea, input {
+  @apply bg-irysBlack text-irysText border border-neutral-800 rounded-md px-3 py-2 w-full;
+  transition: border-color 0.2s ease;
+}
+
+textarea:focus, input:focus {
+  @apply outline-none border-irysAccent;
+  box-shadow: 0 0 0 2px rgba(126, 70, 242, 0.25);
+}
+
+textarea {
+  @apply resize-none;
+  min-height: 100px;
+}
+
+/* ========== COMPONENT STYLES ========== */
+@layer components {
+  .btn-irys {
+    @apply px-5 py-2 rounded-md border border-irysAccent text-white bg-irysAccent hover:bg-opacity-90 transition-all duration-200 relative overflow-hidden;
+  }
+
+  .btn-primary {
+    @apply px-5 py-2 rounded-md border border-primary-green text-white bg-primary-green hover:bg-opacity-90 transition-all duration-200 relative overflow-hidden;
+  }
+  
+  .btn-irys:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  
+  .btn-irys:disabled {
+    @apply bg-gray-600 border-gray-600 text-gray-300 opacity-60 cursor-not-allowed;
+  }
+}
+
+/* ========== BACKGROUND STYLES ========== */
+.bg-landing {
+  background-image: url('/assets/background1.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.bg-dashboard {
+  background-image: url('/assets/background2.jpg');
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+/* ========== CHARACTER STYLES ========== */
+.char-1, .char-2 {
+  width: 100%;
+  height: 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.char-1 {
+  background-image: url('/assets/char1.png');
+}
+
+.char-2 {
+  background-image: url('/assets/char2.png');
+}
+
+/* ========== ANIMATION CLASSES ========== */
+.animate-bounce-slow {
+  animation: bounce 6s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 10s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.scale-animation {
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.claimed-animation {
+  animation: pulse 1.5s ease;
+}
+
+/* ========== ANIMATION KEYFRAMES ========== */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-25px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0) rotate(-5deg); }
+  50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+@keyframes pulseSlow {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.1); }
+  40% { transform: scale(1); }
+  60% { transform: scale(1.05); }
+  80% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(calc(-50% + var(--x, 0) * 50px), calc(-50% + var(--y, 0) * 50px)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes ripple {
+  to {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* ========== UTILITY CLASSES ========== */
+/* Fireworks animation */
+.fireworks-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.firework {
+  position: absolute;
+  z-index: 999;
+}
+
+.particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: explode 1.5s forwards cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Toast notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--irys-accent);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.toast-notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Button ripple effect */
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: rgba(255, 255, 255, 0.3);
+  animation: ripple 0.6s linear;
+  pointer-events: none;
+}
+
+/* Backdrop blur */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.backdrop-blur-md {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* ========== RESPONSIVE ADJUSTMENTS ========== */
+@media (max-width: 640px) {
+  .char-1, .char-2 {
+    display: none;
+  }
+}
