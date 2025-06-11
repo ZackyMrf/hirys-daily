@@ -46,7 +46,7 @@ A daily check-in dApp that rewards users for consistent engagement on the Irys b
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/zackymrf/irys-daily-login.git
+   git clone https://github.com/zackymrf/hirys-daily.git
    cd irys-daily-login/hirysDaily
    ```
 
