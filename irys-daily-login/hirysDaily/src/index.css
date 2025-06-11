@@ -3,11 +3,19 @@
 @tailwind utilities;
 
 /* ========== FOUNDATION ========== */
-/* Font definitions */
+/* Font definitions - UPDATED WITH DUAL FONT WEIGHTS */
+@font-face {
+  font-family: 'HirysFont';
+  src: url('/assets/font2.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'HirysFont';
   src: url('/assets/font.woff2') format('woff2');
-  font-weight: normal;
+  font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
@@ -38,6 +46,10 @@ html {
 body {
   @apply min-h-screen;
   font-family: 'HirysFont', system-ui, sans-serif;
+  font-weight: normal; /* Default to normal weight for the body */
+  letter-spacing: 0.05em; /* INCREASED letter spacing for normal text */
+  word-spacing: 0.08em; /* Added word spacing to improve readability */
+  line-height: 1.6; /* Improved line height for better readability */
   overflow-x: hidden;
 }
 
@@ -53,9 +65,27 @@ button:disabled {
   @apply cursor-not-allowed opacity-60;
 }
 
+/* Enforce bold text to use the bold font with tighter spacing */
+h1, h2, h3, h4, h5, h6, 
+.font-bold, 
+.font-semibold, 
+.font-medium,
+strong {
+  font-weight: bold;
+  letter-spacing: 0; /* Reset letter spacing for bold text */
+  word-spacing: 0; /* Reset word spacing for bold text */
+}
+
+/* Improved spacing for normal weight text */
+p, span, div {
+  letter-spacing: 0.05em; /* INCREASED spacing for all regular text */
+  word-spacing: 0.08em;
+}
+
 textarea, input {
   @apply bg-irysBlack text-irysText border border-neutral-800 rounded-md px-3 py-2 w-full;
   transition: border-color 0.2s ease;
+  letter-spacing: 0.04em; /* Slightly less spacing for inputs but still spaced out */
 }
 
 textarea:focus, input:focus {
@@ -76,6 +106,8 @@ textarea {
 
   .btn-primary {
     @apply px-5 py-2 rounded-md border border-primary-green text-white bg-primary-green hover:bg-opacity-90 transition-all duration-200 relative overflow-hidden;
+    font-weight: bold; /* Use bold font for buttons */
+    letter-spacing: 0; /* Reset letter spacing for buttons */
   }
   
   .btn-irys:active:not(:disabled) {
@@ -276,9 +308,47 @@ textarea {
   -webkit-backdrop-filter: blur(12px);
 }
 
+/* Custom font utility classes with significantly increased spacing */
+.font-normal {
+  font-weight: normal !important;
+  letter-spacing: 0.05em !important;
+  word-spacing: 0.08em !important;
+}
+
+.font-hirys-bold {
+  font-weight: bold !important;
+  letter-spacing: 0 !important;
+}
+
+/* Spaced normal text specific utility - even more spacing for cases where needed */
+.text-spaced {
+  letter-spacing: 0.06em;
+  word-spacing: 0.1em;
+  line-height: 1.7;
+}
+
+/* Extra spaced text for very cramped areas */
+.text-extra-spaced {
+  letter-spacing: 0.08em;
+  word-spacing: 0.12em;
+  line-height: 1.8;
+}
+
 /* ========== RESPONSIVE ADJUSTMENTS ========== */
 @media (max-width: 640px) {
   .char-1, .char-2 {
     display: none;
   }
+  
+  /* Slightly reduce spacing on mobile for better fit */
+  body {
+    letter-spacing: 0.04em;
+    word-spacing: 0.06em;
+  }
+}
+
+/* Extra small screen breakpoint */
+@media screen and (min-width: 375px) {
+  .xxs\:inline { display: inline; }
+  .xxs\:hidden { display: none; }
 }

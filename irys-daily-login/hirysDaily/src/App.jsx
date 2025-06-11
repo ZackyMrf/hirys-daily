@@ -26,6 +26,8 @@ function App() {
   const [lastLoginIntervalId, setLastLoginIntervalId] = useState(null);
   // Track if user manually disconnected
   const [manuallyDisconnected, setManuallyDisconnected] = useState(false);
+  // Track viewport size
+  const [isMobile, setIsMobile] = useState(false);
 
   // Character images
   const fetchCharacter = useCallback(async () => {
@@ -54,6 +56,23 @@ function App() {
       setCharacterLoading(false);
     }
   }, [connected]);
+
+  // Check for mobile viewport
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    // Listen for resize events
+    window.addEventListener('resize', checkMobile);
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile);
+    };
+  }, []);
 
   // Enhanced formatTimeAgo function
   const formatTimeAgo = useCallback((date) => {
@@ -430,8 +449,8 @@ function App() {
     container.className = "fireworks-container";
     document.body.appendChild(container);
     
-    // Create multiple fireworks with random positions and colors - CHANGED TO GREEN
-    const colors = ["#00A86B", "#33CC66", "#00CC99", "#66FF99", "#33FFCC"];
+    // Create multiple fireworks with random positions and colors - CHANGED TO SOFTER GREENS
+    const colors = ["#4ade80", "#34d399", "#10b981", "#047857", "#065f46"];
     
     for (let i = 0; i < 8; i++) {
       setTimeout(() => {
@@ -595,20 +614,20 @@ function App() {
   return (
     <div className="flex flex-col min-h-screen">
       <main 
-        className={`flex-grow text-white relative overflow-hidden ${
+        className={`flex-grow text-gray-100 relative overflow-hidden ${
           !connected ? 'bg-landing' : 'bg-dashboard'
         } bg-fixed bg-cover`}
       >
         {/* Fullscreen claim animation overlay */}
         {showClaimAnimation && (
-          <div className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 pointer-events-none flex items-center justify-center">
-            <div className="text-center scale-animation">
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 pointer-events-none flex items-center justify-center p-4">
+            <div className="text-center scale-animation max-w-[85vw] xs:max-w-xs sm:max-w-sm">
               <div className="text-4xl mb-3">🎉</div>
-              <div className="text-2xl font-bold text-primary-green mb-2">Daily Hirys Claimed!</div>
-              <div className="text-sm text-white/80">Your streak continues!</div>
-              <div className="text-lg font-bold mt-3">
+              <div className="text-xl sm:text-2xl font-bold text-emerald-400 mb-2">Daily Hirys Claimed!</div>
+              <div className="text-xs sm:text-sm font-normal text-gray-200/90">Your streak continues!</div>
+              <div className="text-base sm:text-lg font-bold mt-3">
                 {currentStreak > 1 ? (
-                  <span className="text-yellow-400">🔥 {currentStreak} day streak! 🔥</span>
+                  <span className="text-amber-300">🔥 {currentStreak} day streak! 🔥</span>
                 ) : (
                   <span>Streak started!</span>
                 )}
@@ -617,9 +636,9 @@ function App() {
           </div>
         )}
         
-        {/* Character animation on landing page */}
+        {/* Character animation on landing page - optimized for all screen sizes */}
         {!connected && (
-          <div className="absolute z-10 right-10 bottom-10 w-32 h-32">
+          <div className="absolute z-10 right-3 xs:right-5 sm:right-10 bottom-3 xs:bottom-5 sm:bottom-10 w-16 xs:w-24 sm:w-32 h-16 xs:h-24 sm:h-32 hidden xs:block">
             <div 
               className={`char-1 animate-float ${characterLoading ? 'opacity-50' : 'opacity-100'}`}
               style={{
@@ -629,34 +648,35 @@ function App() {
           </div>
         )}
         
-        {/* Fixed header with improved transparency */}
+        {/* Fixed header with improved transparency and touch targets */}
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
-          <div className="backdrop-blur-md bg-black/5 border-b border-gray-800/20 w-full transition-all duration-300">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <h1 className="text-xl sm:text-2xl font-bold cursor-pointer hover:text-primary-green transition-colors">
+          <div className="backdrop-blur-md bg-black/10 border-b border-gray-700/30 w-full transition-all duration-300">
+            <div className="w-full max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-2 xs:py-3 sm:py-4 flex items-center justify-between">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <h1 className="text-base xs:text-lg sm:text-xl md:text-2xl font-bold cursor-pointer hover:text-emerald-400 transition-colors">
                   Hirys!
                 </h1>
                 
-                {/* Daily Hirys claim button with enhanced animation */}
+                {/* Daily Hirys claim button with enhanced touch target */}
                 {connected && (
                   <button
                     id="claim-button"
                     onClick={handleLogin}
                     disabled={lastLogin || isLoading}
                     title={lastLogin ? "You've already claimed your Daily Hirys today" : "Claim your Daily Hirys"}
-                    className={`btn-primary px-3 py-1 text-sm rounded-full flex items-center gap-1 transition-all relative overflow-hidden
-                      ${lastLogin ? 'bg-gray-600 text-gray-300 opacity-60 cursor-not-allowed' : ''}
-                      ${isLoading ? 'opacity-75 cursor-wait' : lastLogin ? 'opacity-60 cursor-not-allowed' : 'hover:bg-primary-green/80'}`}
+                    className={`btn-primary text-xs xs:text-sm px-2 xs:px-2.5 sm:px-3 py-1.5 xs:py-1.5 sm:py-2 rounded-full flex items-center gap-1 transition-all relative overflow-hidden touch-manipulation min-h-[36px]
+                      ${lastLogin ? 'bg-gray-600/70 text-gray-300 opacity-60 cursor-not-allowed' : ''}
+                      ${isLoading ? 'opacity-75 cursor-wait' : lastLogin ? 'opacity-60 cursor-not-allowed' : 'hover:bg-emerald-500/80'}`}
                   >
                     {isLoading ? (
-                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
+                      <span className="inline-block w-3 h-3 xs:w-3.5 sm:w-4 xs:h-3.5 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-1"></span>
                     ) : lastLogin ? (
                       <span className="inline-block mr-1">🔥</span>
                     ) : (
                       <span className="inline-block mr-1 animate-pulse-slow">🔥</span>
                     )}
-                    {lastLogin ? "Claimed Today!" : "Claim Daily Hirys"}
+                    <span className="hidden xxs:inline font-bold">{lastLogin ? "Claimed Today!" : "Claim Daily Hirys"}</span>
+                    <span className="xxs:hidden font-bold">{lastLogin ? "Claimed!" : "Claim"}</span>
                     
                     {/* Button ripple effect */}
                     <span className="ripple-effect"></span>
@@ -668,128 +688,130 @@ function App() {
                 <button 
                   onClick={connectWallet} 
                   disabled={isLoading}
-                  className={`btn-primary px-4 py-2 text-sm rounded-md flex items-center ${isLoading ? 'opacity-75 cursor-wait' : 'hover:bg-primary-green/80'}`}
+                  className={`btn-primary text-xs xs:text-sm px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 rounded-md flex items-center touch-manipulation min-h-[40px] ${isLoading ? 'opacity-75 cursor-wait' : 'hover:bg-emerald-500/80'}`}
                 >
                   {isLoading ? (
                     <>
-                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
-                      Connecting...
+                      <span className="inline-block w-3 h-3 xs:w-3.5 sm:w-4 xs:h-3.5 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                      <span className="hidden xxs:inline font-bold">Connecting...</span>
+                      <span className="xxs:hidden font-bold">...</span>
                     </>
                   ) : (
-                    <>Connect Wallet</>
+                    <><span className="hidden xxs:inline font-bold">Connect Wallet</span><span className="xxs:hidden font-bold">Connect</span></>
                   )}
                 </button>
               ) : (
                 <button 
                   onClick={disconnectWallet} 
-                  className="btn-primary px-4 py-2 text-sm rounded-md hover:bg-red-600/80"
+                  className="btn-primary text-xs xs:text-sm px-2.5 xs:px-3 sm:px-4 py-1.5 xs:py-2 sm:py-2.5 rounded-md hover:bg-rose-500/70 touch-manipulation min-h-[40px]"
                 >
-                  Disconnect
+                  <span className="hidden xxs:inline font-bold">Disconnect</span>
+                  <span className="xxs:hidden font-bold">Disc.</span>
                 </button>
               )}
             </div>
           </div>
         </header>
 
-        {/* Spacer to prevent content from hiding under fixed header */}
-        <div className="h-16"></div>
+        {/* Responsive spacer to prevent content from hiding under fixed header */}
+        <div className="h-10 xs:h-12 sm:h-16"></div>
 
-        {/* Error toast with retry button */}
+        {/* Error toast with retry button - improved touch target */}
         {error && (
-          <div className="fixed top-20 right-4 bg-red-500 text-white px-4 py-2 rounded-md shadow-lg z-50 animate-fade-in flex items-center">
-            <span>{error}</span>
+          <div className="fixed top-12 xs:top-14 sm:top-20 right-2 xs:right-3 sm:right-4 bg-rose-500/90 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-md shadow-lg z-50 animate-fade-in flex items-center max-w-[94vw] xs:max-w-[90vw] sm:max-w-md">
+            <span className="text-xs xs:text-sm font-normal line-clamp-2">{error}</span>
             <button 
               onClick={() => setError(null)} 
-              className="ml-3 px-2 py-1 bg-white/20 rounded-md text-xs hover:bg-white/30"
+              className="ml-2 sm:ml-3 px-2.5 py-1.5 bg-white/20 rounded-md text-xs hover:bg-white/30 shrink-0 touch-manipulation min-h-[32px] min-w-[60px] font-bold"
             >
               Dismiss
             </button>
           </div>
         )}
 
-        {/* Content section */}
-        <div className="px-4 sm:px-6 lg:px-8 pb-20">
+        {/* Content section with responsive container widths */}
+        <div className="px-3 xs:px-4 sm:px-6 lg:px-8 pb-12 xs:pb-16 sm:pb-20">
           {/* Main content section */}
           {!connected ? (
-            <div className="text-center mt-24 max-w-xl mx-auto relative">
+            <div className="text-center mt-10 xs:mt-16 sm:mt-20 md:mt-24 max-w-[90vw] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl mx-auto relative">
               {/* Animated flame with glow effect */}
-              <div className="mb-8 text-5xl flex justify-center">
+              <div className="mb-4 xs:mb-6 sm:mb-8 text-3xl xs:text-4xl sm:text-5xl flex justify-center">
                 <div className="relative">
                   <span className="animate-pulse inline-block transform hover:scale-110 transition-transform duration-300">🔥</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-green-500/0 via-green-500/30 to-green-500/0 rounded-full filter blur-xl animate-pulse-slow -z-10"></div>
+                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/0 via-emerald-500/20 to-emerald-500/0 rounded-full filter blur-xl animate-pulse-slow -z-10"></div>
                 </div>
               </div>
               
-              <h2 className="text-3xl font-bold mb-4 text-primary-green">Welcome to Daily Hirys</h2>
-              <p className="text-gray-300 mb-8 leading-relaxed">
+              <h2 className="text-xl xs:text-2xl sm:text-3xl font-bold mb-2 xs:mb-3 sm:mb-4 text-emerald-400">Welcome to Daily Hirys</h2>
+              <p className="text-xs xs:text-sm sm:text-base font-normal text-gray-300/90 mb-4 xs:mb-6 sm:mb-8 leading-relaxed">
                 Connect your wallet and say Hirys!
               </p>
               <button 
                 onClick={connectWallet}
-                className="px-8 py-4 bg-primary-green text-white rounded-lg hover:opacity-90 transition-all shadow-lg transform hover:-translate-y-1"
+                className="px-4 xs:px-6 sm:px-8 py-2.5 xs:py-3 sm:py-4 bg-emerald-500 text-white rounded-lg hover:bg-emerald-600 transition-all shadow-lg transform hover:-translate-y-1 text-sm sm:text-base touch-manipulation min-h-[44px] min-w-[180px] font-bold"
               >
                 Start Your Hirys!
               </button>
-              <p className="text-xs text-gray-500 mt-12">
-                Powered by <a href="https://irys.xyz" className="underline hover:text-primary-green">Irys</a>
+              <p className="text-xs font-normal text-gray-500/90 mt-6 xs:mt-8 sm:mt-12">
+                Powered by <a href="https://irys.xyz" className="underline hover:text-emerald-400">Irys</a>
               </p>
             </div>
           ) : (
-            <div className="max-w-2xl mx-auto mt-8 space-y-12 px-2 sm:px-0 relative">
-              {/* Character 1 & 2 on dashboard */}
-              <div className="absolute -left-20 top-0 w-24 h-24">
+            <div className="w-full max-w-[90vw] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto mt-4 xs:mt-6 sm:mt-8 space-y-6 xs:space-y-8 sm:space-y-10 px-0 xs:px-1 sm:px-2 relative">
+              {/* Character animations on dashboard - responsive placement */}
+              <div className="absolute -left-8 xs:-left-12 md:-left-16 top-0 w-16 xs:w-20 h-16 xs:h-20 hidden md:block">
                 <div className="char-1 animate-float-slow"></div>
               </div>
-              <div className="absolute -right-20 top-40 w-32 h-32">
+              <div className="absolute -right-8 xs:-right-12 md:-right-16 top-40 w-20 xs:w-24 h-20 xs:h-24 hidden md:block">
                 <div className="char-2 animate-bounce-slow"></div>
               </div>
               
-              {/* Streak Counter - NEW COMPONENT */}
-              <div className="p-4 border border-gray-700 rounded-lg bg-black/40 backdrop-blur-sm flex justify-between items-center">
-                <div className="flex items-center">
-                  <div className="text-3xl mr-3">🔥</div>
+              {/* Streak Counter - enhanced responsiveness */}
+              <div className="p-2.5 xs:p-3 sm:p-4 border border-gray-700/50 rounded-lg bg-black/30 backdrop-blur-sm flex flex-wrap xs:flex-nowrap justify-between items-center gap-2 xs:gap-3">
+                <div className="flex items-center w-full xs:w-auto">
+                  <div className="text-xl xs:text-2xl sm:text-3xl mr-2 xs:mr-2.5 sm:mr-3">🔥</div>
                   <div>
-                    <div className="font-medium text-white">Current Streak</div>
-                    <div className="text-2xl font-bold text-primary-green">{currentStreak} days</div>
+                    <div className="text-xs xs:text-sm sm:text-base font-normal text-gray-200">Current Streak</div>
+                    <div className="text-lg xs:text-xl sm:text-2xl font-bold text-emerald-400">{currentStreak} days</div>
                   </div>
                 </div>
-                <div className="border-l border-gray-700 pl-4 ml-4">
-                  <div className="font-medium text-white">Best Streak</div>
-                  <div className="text-xl font-bold text-primary-green">{bestStreak} days</div>
+                <div className="border-t xs:border-l border-t-gray-700/50 xs:border-t-0 pt-2 xs:pt-0 xs:pl-3 xs:ml-3 w-full xs:w-auto flex justify-between xs:block">
+                  <div className="text-xs xs:text-sm sm:text-base font-normal text-gray-200">Best Streak</div>
+                  <div className="text-base xs:text-lg sm:text-xl font-bold text-emerald-400">{bestStreak} days</div>
                 </div>
               </div>
               
-              {/* Daily information */}
-              <div className="p-6 border border-gray-700 rounded-lg bg-black/40 backdrop-blur-sm">
-                <h2 className="text-xl font-semibold mb-4 text-primary-green">Your Daily Login</h2>
-                <p className="text-gray-300 mb-3">
-                  Welcome back, <span className="text-white font-medium">{account.slice(0, 6)}...{account.slice(-4)}</span>!
+              {/* Daily information - improved touch targets and spacing */}
+              <div className="p-3 xs:p-4 sm:p-5 md:p-6 border border-gray-700/50 rounded-lg bg-black/30 backdrop-blur-sm">
+                <h2 className="text-base xs:text-lg sm:text-xl font-bold mb-2 xs:mb-3 sm:mb-4 text-emerald-400">Your Daily Login</h2>
+                <p className="text-xs xs:text-sm sm:text-base font-normal text-gray-300/90 mb-2 xs:mb-3">
+                  Welcome back, <span className="text-gray-100 font-medium">{account.slice(0, 6)}...{account.slice(-4)}</span>!
                 </p>
                 
                 {lastLogin ? (
-                  <div className="bg-primary-green/10 border border-primary-green/20 rounded-lg p-4 mb-4">
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-2.5 xs:p-3 sm:p-4 mb-3 xs:mb-4">
                     <div className="flex items-center">
-                      <div className="text-2xl mr-3">✅</div>
-                      <div>
-                        <div className="font-medium">You've already logged in today!</div>
-                        <div className="text-sm text-gray-300">Last login: {lastLogin}</div>
-                        <div className="text-sm text-primary-green font-medium mt-1">
+                      <div className="text-lg xs:text-xl sm:text-2xl mr-2 xs:mr-2.5 sm:mr-3">✅</div>
+                      <div className="flex-1 min-w-0">
+                        <div className="text-xs xs:text-sm sm:text-base font-bold">You've already logged in today!</div>
+                        <div className="text-xs sm:text-sm font-normal text-gray-300/90 truncate">{lastLogin}</div>
+                        <div className="text-xs sm:text-sm text-emerald-400 font-bold mt-1">
                           Current streak: {currentStreak} days
                         </div>
                       </div>
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 mb-4">
+                  <div className="bg-gray-800/30 border border-gray-700/50 rounded-lg p-2.5 xs:p-3 sm:p-4 mb-3 xs:mb-4">
                     <div className="flex items-center">
-                      <div className="text-2xl mr-3">🔥</div>
+                      <div className="text-lg xs:text-xl sm:text-2xl mr-2 xs:mr-2.5 sm:mr-3">🔥</div>
                       <div>
-                        <div className="font-medium">You haven't logged in today yet</div>
-                        <div className="text-sm text-gray-300">
+                        <div className="text-xs xs:text-sm sm:text-base font-bold">You haven't logged in today yet</div>
+                        <div className="text-xs sm:text-sm font-normal text-gray-300/90">
                           Claim your daily login to continue your streak!
                         </div>
                         {currentStreak > 0 && (
-                          <div className="text-sm text-yellow-400 font-medium mt-1">
+                          <div className="text-xs sm:text-sm text-amber-300 font-bold mt-1">
                             Don't break your {currentStreak}-day streak!
                           </div>
                         )}
@@ -801,14 +823,14 @@ function App() {
                 <button
                   onClick={handleLogin}
                   disabled={lastLogin || isLoading}
-                  className={`w-full py-3 rounded-lg font-medium transition-all relative overflow-hidden
+                  className={`w-full py-2.5 xs:py-3 sm:py-3.5 rounded-lg text-xs xs:text-sm sm:text-base font-bold transition-all relative overflow-hidden touch-manipulation min-h-[44px]
                     ${lastLogin 
-                      ? 'bg-gray-600 text-gray-300 opacity-60 cursor-not-allowed' 
-                      : 'bg-primary-green hover:bg-primary-green/80'}`}
+                      ? 'bg-gray-600/70 text-gray-300 opacity-60 cursor-not-allowed' 
+                      : 'bg-emerald-500 hover:bg-emerald-600'}`}
                 >
                   {isLoading ? (
                     <>
-                      <span className="inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                      <span className="inline-block w-3 h-3 xs:w-3.5 sm:w-4 xs:h-3.5 sm:h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
                       Processing...
                     </>
                   ) : lastLogin ? (
@@ -819,69 +841,69 @@ function App() {
                 </button>
                 
                 {status && (
-                  <div className={`mt-3 text-center text-sm ${
-                    status.includes('✅') ? 'text-green-400' : 
-                    status.includes('❌') ? 'text-red-400' : 
-                    status.includes('⚠️') ? 'text-yellow-400' : 
-                    status.includes('👋') ? 'text-blue-400' : 'text-gray-300'
+                  <div className={`mt-3 text-center text-xs sm:text-sm font-normal ${
+                    status.includes('✅') ? 'text-emerald-400' : 
+                    status.includes('❌') ? 'text-rose-400' : 
+                    status.includes('⚠️') ? 'text-amber-300' : 
+                    status.includes('👋') ? 'text-sky-400' : 'text-gray-300/90'
                   }`}>
                     {status}
                   </div>
                 )}
               </div>
               
-              {/* Today's claimers section - ENHANCED */}
+              {/* Today's claimers section - fully responsive with optimized scrolling */}
               <div>
-                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                <h2 className="text-base xs:text-lg sm:text-xl font-bold mb-2 xs:mb-3 sm:mb-4 flex items-center">
                   <span className="mr-2">Today's Claimers</span>
                   {loadingClaimers && (
-                    <span className="inline-block w-4 h-4 border-2 border-primary-green border-t-transparent rounded-full animate-spin"></span>
+                    <span className="inline-block w-3 h-3 xs:w-3.5 sm:w-4 xs:h-3.5 sm:h-4 border-2 border-emerald-400 border-t-transparent rounded-full animate-spin"></span>
                   )}
                 </h2>
                 
                 {todaysClaimers.length === 0 ? (
-                  <div className="text-center py-6 border border-gray-700 rounded-lg bg-black/40 backdrop-blur-sm">
-                    <p className="text-gray-300 text-sm">No one has claimed their Daily Hirys yet today.</p>
-                    <p className="text-gray-400 text-xs mt-1">Be the first to claim!</p>
+                  <div className="text-center py-4 xs:py-5 sm:py-6 border border-gray-700/50 rounded-lg bg-black/30 backdrop-blur-sm">
+                    <p className="text-xs sm:text-sm font-normal text-gray-300/90">No one has claimed their Daily Hirys yet today.</p>
+                    <p className="text-xs mt-1 font-normal text-gray-400/90">Be the first to claim!</p>
                   </div>
                 ) : (
-                  <div className="border border-gray-700 rounded-lg bg-black/40 backdrop-blur-sm overflow-hidden">
-                    <div className="p-3 bg-black/40 border-b border-gray-700 flex justify-between items-center">
-                      <div className="text-sm font-medium text-gray-300">Wallet</div>
-                      <div className="text-sm font-medium text-gray-300">Streak</div>
+                  <div className="border border-gray-700/50 rounded-lg bg-black/30 backdrop-blur-sm overflow-hidden">
+                    <div className="p-2 xs:p-2.5 sm:p-3 bg-black/20 border-b border-gray-700/50 flex justify-between items-center">
+                      <div className="text-xs sm:text-sm font-bold text-gray-300/90">Wallet</div>
+                      <div className="text-xs sm:text-sm font-bold text-gray-300/90">Streak</div>
                     </div>
-                    <div className="divide-y divide-gray-700/50">
+                    <div className="divide-y divide-gray-700/30 max-h-48 xs:max-h-56 sm:max-h-64 overflow-y-auto scrollbar-thin">
                       {todaysClaimers.map((claimer, index) => (
                         <div 
                           key={index} 
-                          className={`p-3 transition-all hover:bg-primary-green/5 ${
+                          className={`p-2 xs:p-2.5 sm:p-3 transition-all hover:bg-emerald-500/5 ${
                             claimer.address === account 
-                              ? 'bg-primary-green/10' 
+                              ? 'bg-emerald-500/10' 
                               : ''
                           }`}
                         >
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              <span className={`text-sm mr-2 ${index < 3 ? 'text-yellow-400' : 'text-gray-500'}`}>
+                            <div className="flex items-center max-w-[50%] lg:max-w-[60%]">
+                              <span className={`text-xs sm:text-sm mr-1 xs:mr-1.5 sm:mr-2 ${index < 3 ? 'text-amber-300' : 'text-gray-500/90'}`}>
                                 {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
                               </span>
-                              <span className="font-mono text-sm cursor-pointer hover:underline text-primary-green">
-                                {claimer.address.slice(0, 6)}...{claimer.address.slice(-4)}
-                                {claimer.address === account && <span className="ml-1 text-xs font-sans">(you)</span>}
+                              <span className="font-mono text-xs sm:text-sm cursor-pointer hover:underline text-emerald-400 truncate font-normal">
+                                {claimer.address.slice(0, 4)}...{claimer.address.slice(-4)}
+                                {claimer.address === account && <span className="ml-1 text-xs font-sans font-bold">(you)</span>}
                               </span>
                             </div>
                             <div className="flex items-center">
-                              <div className="bg-primary-green/20 text-primary-green px-2 py-1 rounded text-xs font-bold">
+                              <div className="bg-emerald-500/15 text-emerald-400 px-1.5 xs:px-2 py-0.5 xs:py-1 rounded text-xs font-bold whitespace-nowrap">
                                 {claimer.streak_count || 1} {claimer.streak_count === 1 ? 'day' : 'days'}
                               </div>
-                              <div className="ml-2 text-xs text-gray-400">{claimer.formattedTime || formatTimeAgo(claimer.last_claim_date)}</div>
+                              <div className="ml-2 text-xs text-gray-400/90 hidden xs:block font-normal">{claimer.formattedTime || formatTimeAgo(claimer.last_claim_date)}</div>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                     <div className="p-2 bg-black/20 text-center">
-                      <button className="text-xs text-primary-green hover:underline">
+                      <button className="text-xs text-emerald-400 hover:underline touch-manipulation py-1 px-3 min-h-[30px] font-bold">
                         View all claimers
                       </button>
                     </div>
@@ -893,35 +915,35 @@ function App() {
         </div>
       </main>
       
-     {/* Footer */}
-     <footer className="w-full backdrop-blur-md bg-black/5 border-t border-gray-800/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-            <div className="mb-4 md:mb-0">
-              <div className="flex items-center">
-                <span className="text-xl font-bold text-primary-green">Hirys!</span>
-                <span className="text-sm ml-2 text-gray-300">Your daily onchain journal</span>
+     {/* Footer - fully responsive with better spacing */}
+     <footer className="w-full backdrop-blur-md bg-black/10 border-t border-gray-700/30">
+        <div className="w-full max-w-3xl md:max-w-4xl lg:max-w-5xl xl:max-w-6xl 2xl:max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 py-3 xs:py-4 sm:py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-3 xs:mb-4">
+            <div className="mb-3 xs:mb-4 md:mb-0 text-center md:text-left">
+              <div className="flex items-center justify-center md:justify-start">
+                <span className="text-base xs:text-lg sm:text-xl font-bold text-emerald-400">Hirys!</span>
+                <span className="text-xs sm:text-sm ml-2 font-normal text-gray-300/90">Your daily onchain journal</span>
               </div>
-              <p className="text-xs text-gray-400 mt-2">
-                  don't forget to say Hirys!
+              <p className="text-xs font-normal text-gray-400/90 mt-1 xs:mt-1.5 sm:mt-2">
+                don't forget to say Hirys!
               </p>
             </div>
             
             <div className="flex flex-col items-center md:items-end">
-              <div className="flex space-x-4 mb-2">
-                <a href="https://x.com/zackymrf_" className="text-gray-300 hover:text-primary-green transition-colors" target="_blank" rel="noopener noreferrer">Twitter</a>
-                <a href="https://discord.com/zackymrf" className="text-gray-300 hover:text-primary-green transition-colors" target="_blank" rel="noopener noreferrer">Discord</a>
-                <a href="https://github.com/zackymrf" className="text-gray-300 hover:text-primary-green transition-colors" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <div className="flex space-x-2 xs:space-x-3 sm:space-x-4 mb-1.5 xs:mb-2">
+                <a href="https://x.com/zackymrf_" className="text-xs sm:text-sm font-normal text-gray-300/90 hover:text-emerald-400 transition-colors touch-manipulation px-1.5 py-1" target="_blank" rel="noopener noreferrer">Twitter</a>
+                <a href="https://discord.com/zackymrf" className="text-xs sm:text-sm font-normal text-gray-300/90 hover:text-emerald-400 transition-colors touch-manipulation px-1.5 py-1" target="_blank" rel="noopener noreferrer">Discord</a>
+                <a href="https://github.com/zackymrf" className="text-xs sm:text-sm font-normal text-gray-300/90 hover:text-emerald-400 transition-colors touch-manipulation px-1.5 py-1" target="_blank" rel="noopener noreferrer">GitHub</a>
               </div>
               <div className="flex items-center">
-                <span className="text-sm text-gray-300">Created by</span>
-                <span className="text-sm ml-2 text-primary-green font-medium">Zackymrf</span>
+                <span className="text-xs sm:text-sm font-normal text-gray-300/90">Created by</span>
+                <span className="text-xs sm:text-sm ml-2 text-emerald-400 font-bold">Zackymrf</span>
               </div>
             </div>
           </div>
-          <div className="text-center border-t border-gray-800/20 pt-4">
-            <p className="text-xs text-gray-400">
-              Powered by <a href="https://irys.xyz" className="text-gray-300 hover:text-primary-green transition-colors">Irys</a> • © {new Date().getFullYear()} All rights reserved
+          <div className="text-center border-t border-gray-700/30 pt-2.5 xs:pt-3 sm:pt-4">
+            <p className="text-xs font-normal text-gray-400/90">
+              Powered by <a href="https://irys.xyz" className="text-gray-300/90 hover:text-emerald-400 transition-colors touch-manipulation" target="_blank" rel="noopener noreferrer">Irys</a> • © {new Date().getFullYear()} All rights reserved
             </p>
           </div>
         </div>
