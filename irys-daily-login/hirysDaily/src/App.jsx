@@ -922,7 +922,7 @@ function App() {
             <div className="mb-3 xs:mb-4 md:mb-0 text-center md:text-left">
               <div className="flex items-center justify-center md:justify-start">
                 <span className="text-base xs:text-lg sm:text-xl font-bold text-emerald-400">Hirys!</span>
-                <span className="text-xs sm:text-sm ml-2 font-normal text-gray-300/90">Your daily onchain journal</span>
+                <span className="text-xs sm:text-sm ml-2 font-normal text-gray-300/90">Your daily onchain</span>
               </div>
               <p className="text-xs font-normal text-gray-400/90 mt-1 xs:mt-1.5 sm:mt-2">
                 don't forget to say Hirys!
