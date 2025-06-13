@@ -46,18 +46,20 @@ const Dashboard = ({
   return (
     <div className="w-full max-w-[90vw] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto mt-4 xs:mt-6 sm:mt-8 space-y-6 xs:space-y-8 sm:space-y-10 px-0 xs:px-1 sm:px-2 relative">
       
-      {/* Debug Toggle Button - Always available */}
-      <div className="fixed bottom-4 left-4 z-40">
-        <button 
-          onClick={() => setShowDebug(!showDebug)}
-          className="bg-gray-800/80 text-white px-2 py-1 rounded text-xs hover:bg-gray-700/80 transition-colors"
-        >
-          Debug {showDebug ? '🔽' : '🔼'}
-        </button>
-      </div>
+      {/* Debug Toggle Button - ONLY IN DEVELOPMENT */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="fixed bottom-4 left-4 z-40">
+          <button 
+            onClick={() => setShowDebug(!showDebug)}
+            className="bg-gray-800/80 text-white px-2 py-1 rounded text-xs hover:bg-gray-700/80 transition-colors"
+          >
+            Debug {showDebug ? '🔽' : '🔼'}
+          </button>
+        </div>
+      )}
 
-      {/* Debug Info - Toggle-able in any environment */}
-      {showDebug && (
+      {/* Debug Info - ONLY IN DEVELOPMENT */}
+      {process.env.NODE_ENV === 'development' && showDebug && (
         <div className="bg-gray-900/90 border border-gray-600 p-3 rounded mb-4 text-xs backdrop-blur-sm">
           <div className="flex justify-between items-start mb-2">
             <strong className="text-yellow-400">Debug Info:</strong>
