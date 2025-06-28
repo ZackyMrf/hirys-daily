@@ -46,12 +46,41 @@ const Dashboard = ({
   return (
     <div className="w-full max-w-[90vw] xs:max-w-xs sm:max-w-sm md:max-w-md lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl mx-auto mt-4 xs:mt-6 sm:mt-8 space-y-6 xs:space-y-8 sm:space-y-10 px-0 xs:px-1 sm:px-2 relative">
       
+      {/* Floating Particles Background */}
+      <div className="particles-bg opacity-30">
+        {[...Array(8)].map((_, i) => (
+          <div
+            key={i}
+            className="particle"
+            style={{
+              left: `${Math.random() * 100}%`,
+              width: `${Math.random() * 4 + 1}px`,
+              height: `${Math.random() * 4 + 1}px`,
+              animationDelay: `${Math.random() * 15}s`,
+              animationDuration: `${Math.random() * 8 + 12}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Welcome Section with Enhanced Design */}
+      <div className="card-enhanced p-6 text-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500"></div>
+        <div className="relative z-10">
+          <div className="text-3xl mb-3 animate-bounce">👋</div>
+          <h2 className="text-gradient text-lg sm:text-xl font-bold mb-2">Welcome back!</h2>
+          <p className="text-gray-300 text-sm">
+            Connected as: <span className="font-mono text-emerald-400">{account?.slice(0, 6)}...{account?.slice(-4)}</span>
+          </p>
+        </div>
+      </div>
+
       {/* Debug Toggle Button - ONLY IN DEVELOPMENT */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.DEV && (
         <div className="fixed bottom-4 left-4 z-40">
           <button 
             onClick={() => setShowDebug(!showDebug)}
-            className="bg-gray-800/80 text-white px-2 py-1 rounded text-xs hover:bg-gray-700/80 transition-colors"
+            className="glass-card bg-gray-800/80 text-white px-3 py-2 rounded-lg text-xs hover:bg-gray-700/80 transition-all duration-300 shadow-lg"
           >
             Debug {showDebug ? '🔽' : '🔼'}
           </button>
@@ -59,25 +88,37 @@ const Dashboard = ({
       )}
 
       {/* Debug Info - ONLY IN DEVELOPMENT */}
-      {process.env.NODE_ENV === 'development' && showDebug && (
-        <div className="bg-gray-900/90 border border-gray-600 p-3 rounded mb-4 text-xs backdrop-blur-sm">
-          <div className="flex justify-between items-start mb-2">
-            <strong className="text-yellow-400">Debug Info:</strong>
+      {import.meta.env.DEV && showDebug && (
+        <div className="glass-card bg-gray-900/90 border border-gray-600/50 p-4 rounded-lg mb-4 text-xs backdrop-blur-md">
+          <div className="flex justify-between items-start mb-3">
+            <strong className="text-yellow-400 text-sm">🔧 Debug Info:</strong>
             <button 
               onClick={handleRefreshStreak}
-              className="bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-500 transition-colors"
+              className="btn-secondary bg-blue-600 text-white px-3 py-1 rounded-lg text-xs hover:bg-blue-500 transition-all duration-300 shadow-md"
             >
-              Refresh Streak
+              🔄 Refresh Streak
             </button>
           </div>
           
-          <div className="space-y-1 font-mono">
-            <div><span className="text-gray-400">Account:</span> {account || 'Not connected'}</div>
-            <div><span className="text-gray-400">Current Streak:</span> <span className="text-green-400">{currentStreak}</span></div>
-            <div><span className="text-gray-400">Best Streak:</span> <span className="text-yellow-400">{bestStreak}</span></div>
-            <div><span className="text-gray-400">LocalStorage Key:</span> streak_{account?.toLowerCase()}</div>
-            <div className="break-all">
-              <span className="text-gray-400">Storage Data:</span> 
+          <div className="space-y-2 font-mono text-xs">
+            <div className="flex justify-between">
+              <span className="text-gray-400">Account:</span> 
+              <span className="text-emerald-400">{account || 'Not connected'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Current Streak:</span> 
+              <span className="text-green-400 font-bold">{currentStreak}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">Best Streak:</span> 
+              <span className="text-yellow-400 font-bold">{bestStreak}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-400">LocalStorage Key:</span> 
+              <span className="text-blue-400">streak_{account?.toLowerCase()}</span>
+            </div>
+            <div className="break-all pt-2 border-t border-gray-600">
+              <span className="text-gray-400">Storage Data:</span>  
               <span className="text-cyan-400">{getStorageData()}</span>
             </div>
             <div><span className="text-gray-400">Today's Claimers:</span> {todaysClaimers?.length || 0}</div>
