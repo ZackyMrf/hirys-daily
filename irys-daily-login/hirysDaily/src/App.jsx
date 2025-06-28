@@ -15,7 +15,6 @@ function App() {
   const [showClaimAnimation, setShowClaimAnimation] = useState(false);
   const [characterUrl, setCharacterUrl] = useState('/assets/char1.png');
   const [characterLoading, setCharacterLoading] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   // Custom hooks
   const wallet = useWallet();
@@ -46,18 +45,9 @@ function App() {
     }
   }, [wallet.connected]);
 
-  // Check mobile viewport
+  // Check mobile viewport - removed as not used
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
+    // Mobile detection removed as it's not being used
   }, []);
 
   // Update countdown timer
@@ -135,26 +125,59 @@ useEffect(() => {
   }
 }, [wallet.account, wallet.connected, streak, leaderboard]);
 const handleLogin = async () => {
+  console.log('🎯 Handle login called');
+  
   if (!wallet.account) {
-    setStatus("Please connect your wallet first");
+    const errorMsg = "❌ Please connect your wallet first";
+    setStatus(errorMsg);
+    console.log(errorMsg);
     return;
   }
   
-  setStatus("⏳ Processing...");
+  if (!wallet.connected) {
+    const errorMsg = "❌ Wallet not connected properly";
+    setStatus(errorMsg);
+    console.log(errorMsg);
+    return;
+  }
+  
+  console.log('💼 Wallet account:', wallet.account);
+  console.log('🌐 Current chain ID:', wallet.chainId);
+  console.log('✅ Is on correct network:', wallet.isOnCorrectNetwork);
+  
+  setStatus("⏳ Preparing transaction...");
   wallet.setError(null);
   
   try {
+    // Step 1: Check network
+    if (!wallet.isOnCorrectNetwork) {
+      console.log('🔄 Wrong network, switching...');
+      setStatus("🔄 Switching to Irys Testnet...");
+      await wallet.switchToIrysNetwork();
+      setStatus("✅ Network switched successfully");
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for network switch
+    }
+    
+    // Step 2: Execute transaction
+    console.log('🚀 Executing daily login transaction...');
+    setStatus("⏳ Submitting transaction...");
+    const tx = await contract.dailyLogin(wallet.switchToIrysNetwork);
+    
+    console.log('📤 Transaction submitted:', tx.hash);
     setStatus("⏳ Transaction submitted, waiting for confirmation...");
-    await contract.dailyLogin(wallet.switchToIrysNetwork);
+    
+    // Step 3: Success handling
     setStatus("✅ Daily login successful!");
+    console.log('🎉 Daily login successful!');
     
-    // Update streak with proper validation
+    // Step 4: Update streak and UI
     const newStreak = streak.updateStreak(wallet.account, streak.streakDate);
+    console.log('🔥 New streak:', newStreak);
     
-    // Trigger animation
+    // Step 5: Trigger celebration animation
     setShowClaimAnimation(true);
     
-    // Add to today's claimers
+    // Step 6: Add to leaderboard
     leaderboard.addTodaysClaimer({
       address: wallet.account,
       streak_count: newStreak,
@@ -162,21 +185,44 @@ const handleLogin = async () => {
       timestamp: Math.floor(Date.now() / 1000)
     });
     
-    // Refresh data
-    contract.checkLastLogin(wallet.account);
-    leaderboard.fetchAllTimeLeaders();
+    // Step 7: Refresh data
+    setTimeout(() => {
+      contract.checkLastLogin(wallet.account);
+      leaderboard.fetchAllTimeLeaders();
+    }, 2000);
+    
+    // Clear status after delay
+    setTimeout(() => setStatus(""), 5000);
     
   } catch (err) {
-    console.error(err);
+    console.error("❌ Daily login error:", err);
+    
+    // Enhanced error handling with specific messages
+    let errorMessage = "❌ Failed to login";
     
     if (err.message && err.message.includes("You've already logged in today")) {
-      setStatus("⚠️ You already logged in today");
-    } else if (err.code === 'ACTION_REJECTED') {
-      setStatus("❌ Transaction rejected by user");
-    } else {
-      setStatus("❌ Failed to login: " + (err.reason || err.message || "Unknown error"));
+      errorMessage = "⚠️ You already logged in today! Please wait 24 hours.";
+    } else if (err.message && err.message.includes("rejected")) {
+      errorMessage = "❌ Transaction was rejected. Please try again.";
+    } else if (err.message && err.message.includes("insufficient funds")) {
+      errorMessage = "❌ Insufficient IRYS for gas fees. Please add some IRYS to your wallet.";
+    } else if (err.message && err.message.includes("network")) {
+      errorMessage = "❌ Network error. Please check your connection.";
+    } else if (err.message && err.message.includes("MetaMask")) {
+      errorMessage = "❌ MetaMask error. Please try reconnecting your wallet.";
+    } else if (err.code === 'ACTION_REJECTED' || err.code === 4001) {
+      errorMessage = "❌ Transaction rejected by user.";
+    } else if (err.reason) {
+      errorMessage = `❌ ${err.reason}`;
+    } else if (err.message) {
+      errorMessage = `❌ ${err.message}`;
     }
+    
+    setStatus(errorMessage);
     wallet.setError(err.message || "Failed to login");
+    
+    // Clear error status after delay
+    setTimeout(() => setStatus(""), 10000);
   }
 };
 
@@ -202,7 +248,8 @@ useEffect(() => {
       await wallet.connectWallet();
       setStatus("✅ Wallet connected successfully!");
       setTimeout(() => setStatus(""), 3000);
-    } catch (err) {
+    } catch (error) {
+      console.error("Connect wallet error:", error);
       setStatus("❌ Failed to connect wallet");
     }
   };
